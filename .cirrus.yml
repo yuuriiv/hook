@@ -1,0 +1,52 @@
+env:
+# ENCRYPTED
+  RCLONECONFIG_DRIVE: ""
+  TG_TOKEN: ""
+  TG_CHAT_ID: ""
+  CREDENTIALS: ""
+  USER: ""
+  EMAIL: ""
+  KBUILD_BUILD_USER: ""
+  KBUILD_BUILD_HOST: ""
+
+# FLAG
+  WORKDIR: "/tmp"
+  CIRRUS_CLONE_DEPTH: "1"
+
+task:
+  name: "Setting Up, Syncing, Building and Uploading"
+  only_if: $CIRRUS_REPO_OWNER == 'c3eru'
+  timeout_in: 120m
+  container:
+    image: c3eru/gaspoll:22.04
+    cpu: 8
+    memory: 32G
+
+  Memuat-ccache_background_script:
+     - ./memuat_ccache.sh
+     
+  Repo-pribadi_script:
+     - git config --global user.name "$USER"
+     - git config --global user.email "$EMAIL"
+     - echo "$CREDENTIALS" > ~/.git-credentials
+     - git config --global credential.helper store --file=~/.git-credentials
+     - export KBUILD_BUILD_USER=$KBUILD_BUILD_USER
+     - export KBUILD_BUILD_HOST=$KBUILD_BUILD_USER
+     - export BUILD_USERNAME=$KBUILD_BUILD_USER
+     - export BUILD_HOSTNAME=$KBUILD_BUILD_USER
+     - export TZ=Asia/Jakarta
+
+
+  Sinkronisasi_script:
+     - ./sinkronisasi.sh
+     
+  Build-rom_script:
+     - ./membangun.sh
+     
+  Ccache-info_script:
+     - set -e
+     - export CCACHE_DIR=$WORKDIR/ccache
+     - ccache -s
+
+  Upload-build_script:
+     - ./mengemas.sh
