@@ -24,4 +24,4 @@ retVal=$?
 timeEnd
 statusBuild
 
-# start 11:26 WIB
+# start 19:26 WIB
